@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class StockResponseDTO {
+public class StockBancoSangreDTO {
     private String grupoSanguineo;
     private String rh;
     private String tipoUnidad;
@@ -15,7 +15,7 @@ public class StockResponseDTO {
 
     @Override
     public String toString() {
-        return "StockResponseDTO[grupoSanguineo=" + grupoSanguineo + ", rh=" + rh + ", tipoUnidad=" + tipoUnidad + ", cantidad=" + cantidad + "]";
+        return "StockBancoSangreDTO[grupoSanguineo=" + grupoSanguineo + ", rh=" + rh + ", tipoUnidad=" + tipoUnidad + ", cantidad=" + cantidad + "]";
     }
 }
 

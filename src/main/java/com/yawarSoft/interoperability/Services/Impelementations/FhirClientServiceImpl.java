@@ -6,7 +6,7 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
 import com.yawarSoft.interoperability.Dtos.AuthLoginRequest;
-import com.yawarSoft.interoperability.Dtos.StockResponseDTO;
+import com.yawarSoft.interoperability.Dtos.StockBancoSangreDTO;
 import com.yawarSoft.interoperability.Services.Interfaces.FhirClientService;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Observation;
@@ -29,7 +29,7 @@ public class FhirClientServiceImpl implements FhirClientService {
 
 
     @Override
-    public List<StockResponseDTO> getObservationsFromExternalSystemByName(String nombreBanco) {
+    public List<StockBancoSangreDTO> getObservationsFromExternalSystemByName(String nombreBanco) {
         String urlBaseExterno = "http://localhost:8081";
         String token = login(urlBaseExterno);
         // 1️⃣ Consultar todos los bancos de sangre
@@ -58,7 +58,7 @@ public class FhirClientServiceImpl implements FhirClientService {
     }
 
     @Override
-    public List<StockResponseDTO> getObservationsFromExternalSystemById(Integer idBloodBank) {
+    public List<StockBancoSangreDTO> getObservationsFromExternalSystemById(Integer idBloodBank) {
         String urlBaseExterno = "http://localhost:8081";
         String token = login(urlBaseExterno);
 
@@ -108,7 +108,7 @@ public class FhirClientServiceImpl implements FhirClientService {
         }
     }
 
-    public List<StockResponseDTO> toStockResponseList(Bundle bundle) {
+    public List<StockBancoSangreDTO> toStockResponseList(Bundle bundle) {
         return bundle.getEntry().stream()
                 .map(Bundle.BundleEntryComponent::getResource)
                 .filter(resource -> resource instanceof Observation)
@@ -144,7 +144,7 @@ public class FhirClientServiceImpl implements FhirClientService {
                         }
                     }
 
-                    return StockResponseDTO.builder()
+                    return StockBancoSangreDTO.builder()
                             .grupoSanguineo(bloodType)
                             .rh(rhFactor)
                             .tipoUnidad(unitType)

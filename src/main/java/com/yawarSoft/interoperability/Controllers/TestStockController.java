@@ -1,6 +1,6 @@
 package com.yawarSoft.interoperability.Controllers;
 
-import com.yawarSoft.interoperability.Dtos.StockResponseDTO;
+import com.yawarSoft.interoperability.Dtos.StockBancoSangreDTO;
 import com.yawarSoft.interoperability.Services.Interfaces.FhirClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +14,11 @@ public class TestStockController {
     private FhirClientService fhirClientService;
 
     @GetMapping("/stock")
-    public List<StockResponseDTO> getExternalStock(
+    public List<StockBancoSangreDTO> getExternalStock(
             @RequestParam(required = false) Integer idBloodBank,
             @RequestParam(required = false) String nombre) {
 
-        List<StockResponseDTO> stockList;
+        List<StockBancoSangreDTO> stockList;
 
         if (idBloodBank != null) {
             // Caso 1: Ya tengo el ID del banco
