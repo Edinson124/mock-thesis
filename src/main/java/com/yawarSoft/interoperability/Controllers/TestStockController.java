@@ -18,16 +18,25 @@ public class TestStockController {
             @RequestParam(required = false) Integer idBloodBank,
             @RequestParam(required = false) String nombre) {
 
+        List<StockResponseDTO> stockList;
+
         if (idBloodBank != null) {
             // Caso 1: Ya tengo el ID del banco
-            return fhirClientService.getObservationsFromExternalSystemById(idBloodBank);
+            stockList = fhirClientService.getObservationsFromExternalSystemById(idBloodBank);
         } else if (nombre != null && !nombre.isEmpty()) {
             // Caso 2: Tengo el nombre, primero resuelvo el id
-            return fhirClientService.getObservationsFromExternalSystemByName(nombre);
+            stockList = fhirClientService.getObservationsFromExternalSystemByName(nombre);
         } else {
             // Ningún parámetro válido
             throw new IllegalArgumentException("Se requiere idBloodBank o nombre para obtener el stock");
         }
-    }
 
+        // Ahora hacemos el sout para los que tienen quantity > 0
+        stockList.stream()
+                .filter(s -> s.getCantidad() != null && s.getCantidad() > 0)
+                .forEach(s -> System.out.println(s.toString()));
+
+        return stockList;
+    }
 }
+

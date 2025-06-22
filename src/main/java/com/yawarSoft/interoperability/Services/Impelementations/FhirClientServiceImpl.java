@@ -145,10 +145,10 @@ public class FhirClientServiceImpl implements FhirClientService {
                     }
 
                     return StockResponseDTO.builder()
-                            .bloodType(bloodType)
-                            .rhFactor(rhFactor)
-                            .unitType(unitType)
-                            .quantity(quantity)
+                            .grupoSanguineo(bloodType)
+                            .rh(rhFactor)
+                            .tipoUnidad(unitType)
+                            .cantidad(quantity)
                             .build();
                 })
                 .toList();

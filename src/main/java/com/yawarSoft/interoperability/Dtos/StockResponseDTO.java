@@ -8,9 +8,14 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StockResponseDTO {
-    private String bloodType;
-    private String rhFactor;
-    private String unitType;
-    private Long quantity;
+    private String grupoSanguineo;
+    private String rh;
+    private String tipoUnidad;
+    private Long cantidad;
+
+    @Override
+    public String toString() {
+        return "StockResponseDTO[grupoSanguineo=" + grupoSanguineo + ", rh=" + rh + ", tipoUnidad=" + tipoUnidad + ", cantidad=" + cantidad + "]";
+    }
 }
 
