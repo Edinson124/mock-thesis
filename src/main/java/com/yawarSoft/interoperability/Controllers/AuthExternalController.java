@@ -27,6 +27,7 @@ public class AuthExternalController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthLoginRequest userRequest){
+        System.out.println("login Controller API");
         AuthResponse authResponse = clientDetailService.loginClientExternal(userRequest);
         String token = authResponse.jwt();
         long expirationTimestamp = Constants.getTimeToken();

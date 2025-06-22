@@ -67,7 +67,7 @@ public class JWTTokenValidator extends OncePerRequestFilter {
                 String userName = jwtUtils.extractUserName(decodedJWT);
                 //obtenemos authorities en un string separado por comas, esto es por como lo hemos programado
                 String authoritiesString = jwtUtils.getSpecificClaim(decodedJWT, "authorities").asString();
-                Integer userId = jwtUtils.getSpecificClaim(decodedJWT, "id").asInt();
+                String userId = jwtUtils.getSpecificClaim(decodedJWT, "id").asString();
 
                 //Se usa AuthorityUtils de spring security que devuelve un collection de Authorities a partir del string separado por comas
                 Collection<? extends GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(authoritiesString);
@@ -92,7 +92,7 @@ public class JWTTokenValidator extends OncePerRequestFilter {
 
     }
 
-    private static SecurityContext setSecurityContext(Integer userId, String userName, Collection<? extends GrantedAuthority> authorities) {
+    private static SecurityContext setSecurityContext(String userId, String userName, Collection<? extends GrantedAuthority> authorities) {
         SecurityContext context = SecurityContextHolder.getContext();
 
         // Valores por defecto ya que el JWT no los tiene

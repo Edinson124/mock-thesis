@@ -1,111 +1,100 @@
 package com.yawarSoft.interoperability.Services.Impelementations;
 
-import ca.uhn.fhir.rest.server.exceptions.ForbiddenOperationException;
-import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import com.yawarSoft.interoperability.Dtos.StockResumenDTO;
-import com.yawarSoft.interoperability.Entities.AuthExternalSystemEntity;
-import com.yawarSoft.interoperability.Entities.BloodBankEntity;
 import com.yawarSoft.interoperability.Enums.BloodSNOMED;
-import com.yawarSoft.interoperability.Enums.NetworkBBStatus;
 import com.yawarSoft.interoperability.Enums.UnitTypes;
-import com.yawarSoft.interoperability.Repositories.BloodBankNetworkRepository;
-import com.yawarSoft.interoperability.Repositories.BloodBankRepository;
-import com.yawarSoft.interoperability.Repositories.UnitRepository;
+import com.yawarSoft.interoperability.Repositories.InMemoryUnitRepositoryMock;
 import com.yawarSoft.interoperability.Services.Interfaces.AuthenticatedExternalClientService;
 import com.yawarSoft.interoperability.Services.Interfaces.UnitService;
 import org.hl7.fhir.r4.model.*;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class UnitServiceImpl implements UnitService {
 
-    private final UnitRepository unitRepository;
-    private final BloodBankRepository bloodBankRepository;
+    private final InMemoryUnitRepositoryMock unitRepositoryMock;
     private final AuthenticatedExternalClientService authenticatedExternalClientService;
-    private final BloodBankNetworkRepository bloodBankNetworkRepository;
 
-    public UnitServiceImpl(UnitRepository unitRepository, BloodBankRepository bloodBankRepository, AuthenticatedExternalClientService authenticatedExternalClientService, BloodBankNetworkRepository bloodBankNetworkRepository) {
-        this.unitRepository = unitRepository;
-        this.bloodBankRepository = bloodBankRepository;
+    public UnitServiceImpl(InMemoryUnitRepositoryMock unitRepositoryMock, AuthenticatedExternalClientService authenticatedExternalClientService) {
+        this.unitRepositoryMock = unitRepositoryMock;
         this.authenticatedExternalClientService = authenticatedExternalClientService;
-        this.bloodBankNetworkRepository = bloodBankNetworkRepository;
     }
 
 
     @Override
-    public List<Observation> getStockByBloodBank(String bloodBankId) {
-        AuthExternalSystemEntity authExternalSystem = authenticatedExternalClientService.getExternalClient();
-        Integer idBloodBankAuth = authExternalSystem.getBloodBank().getId();
+    public Bundle getStockByBloodBank() {
+        List<StockResumenDTO> resumenDB = unitRepositoryMock.getResumenStock();
+        List<Observation> observations = buildObservations(resumenDB);
 
-        Integer id = Integer.valueOf(bloodBankId);
-
-        BloodBankEntity banco = bloodBankRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Banco de sangre no encontrado"));
-        String nombreBanco = banco.getName();
-
-        long relations = bloodBankNetworkRepository.countActiveRelationsBetweenBanks(
-                idBloodBankAuth, id, NetworkBBStatus.ACTIVE.name());
-
-        if (relations == 0) {
-            throw new ForbiddenOperationException("No pertenece a una misma red.");
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Observation obs : observations) {
+            bundle.addEntry()
+                    .setFullUrl("urn:uuid:" + obs.getId())
+                    .setResource(obs);
         }
-
-
-        List<StockResumenDTO> resumenDB = unitRepository.getResumenStockByBloodBank(id);
-        return buildObservations(resumenDB, id, nombreBanco);
+        return bundle;
     }
 
-    private List<Observation> buildObservations(List<StockResumenDTO> resumenDB, Integer id, String nombreBanco) {
-        List<String> bloodTypes = List.of("O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-");
+    private List<Observation> buildObservations(List<StockResumenDTO> resumenDB) {
+        // Listas estándar
+        List<String> bloodTypes = List.of("O|POS", "O|NEG", "A|POS", "A|NEG", "B|POS", "B|NEG", "AB|POS", "AB|NEG");
         List<String> unitTypes = Arrays.stream(UnitTypes.values())
                 .map(UnitTypes::getLabel)
                 .toList();
 
         // Crear mapa para búsqueda rápida
-        Map<String, StockResumenDTO> resumenMap = new HashMap<>();
-        for (StockResumenDTO dto : resumenDB) {
-            String key = dto.getBloodType() + "|" + dto.getUnitType();
-            resumenMap.put(key, dto);
-        }
+        Map<String, StockResumenDTO> resumenMap = resumenDB.stream()
+                .collect(Collectors.toMap(d -> d.getSangre() + "|" + d.getRh() + "|" + d.getTipo(), d -> d));
 
         // Crear listado final para todas las combinaciones
         List<StockResumenDTO> resumenFinal = new ArrayList<>();
         for (String blood : bloodTypes) {
             for (String unit : unitTypes) {
-                String key = blood + "|" + unit;
-                if (resumenMap.containsKey(key)) {
-                    resumenFinal.add(resumenMap.get(key));
-                } else {
-                    resumenFinal.add(new StockResumenDTO(blood, unit, 0L));
-                }
+                String[] bloodParts = blood.split("\\|");
+                String sangre = bloodParts[0];
+                String rh = bloodParts[1];
+                String key = sangre + "|" + rh + "|" + unit;
+
+                resumenFinal.add(
+                        resumenMap.getOrDefault(key,
+                                StockResumenDTO.builder()
+                                        .sangre(sangre)
+                                        .rh(rh)
+                                        .tipo(unit)
+                                        .cantidad(0L)
+                                        .build())
+                );
             }
         }
 
         // Ahora construir las Observation
         List<Observation> observations = new ArrayList<>();
-
         for (StockResumenDTO stock : resumenFinal) {
             Observation obs = new Observation();
             obs.setId(IdType.newRandomUuid());
             obs.setStatus(Observation.ObservationStatus.FINAL);
-            obs.setCode(new CodeableConcept().setText(stock.getUnitType()));
-            obs.setValue(new Quantity().setValue(stock.getQuantity()).setUnit("unidades"));
+            obs.setCode(new CodeableConcept().setText(stock.getTipo()));
+            obs.setValue(new Quantity().setValue(stock.getCantidad()).setUnit("unidades"));
 
-            String fullType = stock.getBloodType();
-            String bloodGroup = fullType.replace("+", "").replace("-", "");
-            boolean isRhPositive = fullType.contains("+");
+            BloodSNOMED bloodSNOMED = BloodSNOMED.fromLabel(stock.getSangre());
 
-            BloodSNOMED bloodSNOMED = BloodSNOMED.fromLabel(bloodGroup);
-
+            // Grupo sanguíneo
             CodeableConcept bloodGroupConcept = new CodeableConcept()
                     .addCoding(new Coding()
                             .setSystem("http://snomed.info/sct")
                             .setCode(bloodSNOMED.getSnomedCode())
                             .setDisplay(bloodSNOMED.getDisplay()))
-                    .setText("Grupo sanguíneo " + bloodGroup);
+                    .setText("Grupo sanguíneo " + stock.getSangre());
 
+            // Factor Rh
+            boolean isRhPositive = "POS".equals(stock.getRh());
             CodeableConcept rhConcept = new CodeableConcept()
                     .addCoding(new Coding()
                             .setSystem("http://snomed.info/sct")
@@ -121,13 +110,10 @@ public class UnitServiceImpl implements UnitService {
                     .setCode(new CodeableConcept().setText("Factor Rh"))
                     .setValue(rhConcept));
 
-            obs.addPerformer(new Reference("Organization/" + id).setDisplay(nombreBanco));
-
             observations.add(obs);
         }
 
         return observations;
     }
-
 
 }

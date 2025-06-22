@@ -9,7 +9,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StockResumenDTO{
-    private String bloodType;
-    private String unitType;
-    private Long quantity;
+    private String sangre;
+    private String rh;
+    private String tipo;
+    private Long cantidad;
 }

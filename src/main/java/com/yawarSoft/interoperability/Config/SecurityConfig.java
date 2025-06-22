@@ -43,6 +43,7 @@ public class SecurityConfig {
                     http.requestMatchers("/customError").permitAll();
                     http.requestMatchers("/error").permitAll();
                     http.requestMatchers("/access-denied").permitAll();
+                    http.requestMatchers("/fhir/metadata").permitAll();
                     http.requestMatchers(HttpMethod.POST, "/client/auth/login").permitAll();
 
 //                    http.requestMatchers("/fhir/**").permitAll();

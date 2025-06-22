@@ -9,7 +9,7 @@ import java.util.Collection;
 
 public class CustomUserDetails implements UserDetails {
     @Getter
-    private final Integer id;
+    private final String id;
     private final String username;
     private final String password;
     private final boolean enabled;
@@ -18,7 +18,7 @@ public class CustomUserDetails implements UserDetails {
     private final boolean accountNonLocked;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetails(Integer id, String username, String password, boolean enabled,
+    public CustomUserDetails(String id, String username, String password, boolean enabled,
                              boolean accountNonExpired, boolean credentialsNonExpired,
                              boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;

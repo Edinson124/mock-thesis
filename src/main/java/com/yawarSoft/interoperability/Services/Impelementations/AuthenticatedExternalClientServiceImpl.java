@@ -1,8 +1,8 @@
 package com.yawarSoft.interoperability.Services.Impelementations;
 
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
-import com.yawarSoft.interoperability.Entities.AuthExternalSystemEntity;
-import com.yawarSoft.interoperability.Repositories.AuthExternalSystemRepository;
+import com.yawarSoft.interoperability.Entities.AuthExternalSystemMock;
+import com.yawarSoft.interoperability.Repositories.InMemoryAuthExternalRepositoryMock;
 import com.yawarSoft.interoperability.Services.Interfaces.AuthenticatedExternalClientService;
 import com.yawarSoft.interoperability.Utils.AuthExternalClientUtils;
 import org.springframework.stereotype.Service;
@@ -10,16 +10,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthenticatedExternalClientServiceImpl implements AuthenticatedExternalClientService {
 
-    private  final AuthExternalSystemRepository authExternalSystemRepository;
+    private final InMemoryAuthExternalRepositoryMock authExternalRepositoryMock;
 
-    public AuthenticatedExternalClientServiceImpl(AuthExternalSystemRepository authExternalSystemRepository) {
-        this.authExternalSystemRepository = authExternalSystemRepository;
+    public AuthenticatedExternalClientServiceImpl(InMemoryAuthExternalRepositoryMock authExternalRepositoryMock) {
+        this.authExternalRepositoryMock = authExternalRepositoryMock;
     }
 
     @Override
-    public AuthExternalSystemEntity getExternalClient() {
-        AuthExternalSystemEntity externalSystem = AuthExternalClientUtils.getAuthenticatedUser();
-        return authExternalSystemRepository.findById(externalSystem.getId())
+    public AuthExternalSystemMock getExternalClient() {
+        AuthExternalSystemMock externalSystem = AuthExternalClientUtils.getAuthenticatedUser();
+        return authExternalRepositoryMock.findByUuid(externalSystem.getUuid())
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente externo no encontrado"));
     }
 }

@@ -37,7 +37,7 @@ public class JwtUtils {
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         String username = userDetails.getUsername();
-        Integer userId = userDetails.getId();
+        String userId = userDetails.getId();
 
         String authorities = authentication.getAuthorities()
                 .stream()
