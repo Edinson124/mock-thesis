@@ -3,6 +3,7 @@ package com.yawarSoft.interoperability.Repositories;
 import com.yawarSoft.interoperability.Dtos.StockResumenDTO;
 import com.yawarSoft.interoperability.Entities.BloodTypeMock;
 import com.yawarSoft.interoperability.Entities.UnitMock;
+import com.yawarSoft.interoperability.Enums.UnitTypes;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class InMemoryUnitRepositoryMock {
         // Carga inicial de datos
         units.add(UnitMock.builder()
                 .id("1")
-                .tipo("Concentrado de hematíes")
+                .tipo(UnitTypes.CONCENTRADO_HEMATIES.getLabel())
                 .grupoSanguineo(aPos)
                 .fechaVencimiento("2025-12-31")
                 .estado("ALMACENADO")
@@ -41,7 +42,7 @@ public class InMemoryUnitRepositoryMock {
 
         units.add(UnitMock.builder()
                 .id("2")
-                .tipo("Plasma fresco")
+                .tipo(UnitTypes.PLASMA_FRESCO.getLabel())
                 .grupoSanguineo(oNeg)
                 .fechaVencimiento("2025-10-15")
                 .estado("ALMACENADO")
@@ -49,7 +50,7 @@ public class InMemoryUnitRepositoryMock {
 
         units.add(UnitMock.builder()
                 .id("3")
-                .tipo("Concentrado de hematíes")
+                .tipo(UnitTypes.CONCENTRADO_HEMATIES.getLabel())
                 .grupoSanguineo(aPos)
                 .fechaVencimiento("2025-08-30")
                 .estado("VENCIDO")

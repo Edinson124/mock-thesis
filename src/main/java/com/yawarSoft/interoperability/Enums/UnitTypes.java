@@ -5,11 +5,11 @@ import lombok.Getter;
 @Getter
 public enum UnitTypes {
     SANGRE_TOTAL("Sangre completa"),
-    CONCENTRADO_ERITROCITOS("Concentrado de hematíes"),
-    PLASMA_FRESCO_CONGELADO("Plasma fresco"),
+    CONCENTRADO_HEMATIES("Concentrado de hematíes"),
+    PLASMA_FRESCO("Plasma fresco"),
     CRIOPRECIPITADOS("Crioprecipitados"),
     PLAQUETAS("Plaquetas"),
-    AFERESIS_PLAQUETAS("Aféresis de plaquetaria"),
+    AFERESIS_PLAQUETARIA("Aféresis plaquetaria"),
     AFERESIS_GLOBULOS_ROJOS("Aféresis de glóbulos rojos"),
     AFERESIS_PLASMA("Aféresis de plasma"),;
 
