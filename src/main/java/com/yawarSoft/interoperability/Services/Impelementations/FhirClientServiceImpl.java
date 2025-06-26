@@ -114,25 +114,29 @@ public class FhirClientServiceImpl implements FhirClientService {
                 .filter(resource -> resource instanceof Observation)
                 .map(resource -> (Observation) resource)
                 .map(observation -> {
-                    String unitType = observation.getCode().getText();
                     Long quantity = observation.getValueQuantity() != null && observation.getValueQuantity().getValue() != null
                             ? observation.getValueQuantity().getValue().longValue()
                             : 0L;
 
                     String bloodType = null;
                     String rhFactor = null;
+                    String unitType = null;
 
                     for (Observation.ObservationComponentComponent component : observation.getComponent()) {
-                        if ("Grupo sanguíneo".equals(component.getCode().getText())) {
-                            // "Grupo sanguíneo O" -> Queremos "O"
-                            String text = component.getValueCodeableConcept().getText();
-                            if (text != null && text.startsWith("Grupo sanguíneo ")) {
-                                bloodType = text.replace("Grupo sanguíneo ", "");
+                        String componentCodeText = component.getCode().getText();
+                        String valueText = component.getValueCodeableConcept() != null
+                                ? component.getValueCodeableConcept().getText()
+                                : null;
+
+                        if ("Grupo sanguíneo".equals(componentCodeText) && valueText != null) {
+                            // "Grupo sanguíneo O" -> "O"
+                            if (valueText.startsWith("Grupo sanguíneo ")) {
+                                bloodType = valueText.replace("Grupo sanguíneo ", "");
                             } else {
-                                bloodType = text;
+                                bloodType = valueText;
                             }
-                        } else if ("Factor Rh".equals(component.getCode().getText())) {
-                            // "Rh positivo" -> Queremos "POS"; "Rh negativo" -> "NEG"
+                        } else if ("Factor Rh".equals(componentCodeText) && component.getValueCodeableConcept() != null) {
+                            // "Rh positivo" -> "POSITIVO"; "Rh negativo" -> "NEGATIVO"
                             String display = component.getValueCodeableConcept().getCodingFirstRep().getDisplay();
                             if ("Rh positivo".equals(display)) {
                                 rhFactor = "POSITIVO";
@@ -141,6 +145,9 @@ public class FhirClientServiceImpl implements FhirClientService {
                             } else {
                                 rhFactor = display;
                             }
+                        } else if ("Tipo de unidad".equals(componentCodeText) && valueText != null) {
+                            // Aquí viene el texto de la unidad (e.g., "Sangre total", "Concentrado de eritrocitos", etc.)
+                            unitType = valueText;
                         }
                     }
 

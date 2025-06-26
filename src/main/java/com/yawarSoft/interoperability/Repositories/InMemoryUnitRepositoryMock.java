@@ -42,7 +42,7 @@ public class InMemoryUnitRepositoryMock {
 
         units.add(UnitMock.builder()
                 .id("2")
-                .tipo(UnitTypes.PLASMA_FRESCO.getLabel())
+                .tipo(UnitTypes.PLASMA.getLabel())
                 .grupoSanguineo(oNeg)
                 .fechaVencimiento("2025-10-15")
                 .estado("ALMACENADO")
