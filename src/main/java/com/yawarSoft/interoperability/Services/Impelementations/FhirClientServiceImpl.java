@@ -30,7 +30,7 @@ public class FhirClientServiceImpl implements FhirClientService {
 
     @Override
     public List<StockBancoSangreDTO> getObservationsFromExternalSystemByName(String nombreBanco) {
-        String urlBaseExterno = "http://localhost:8081";
+        String urlBaseExterno = "http://3.236.29.17:8081";
         String token = login(urlBaseExterno);
         // 1️⃣ Consultar todos los bancos de sangre
         List<Organization> bancos = obtenerBancosExterno(urlBaseExterno, token);
@@ -59,7 +59,7 @@ public class FhirClientServiceImpl implements FhirClientService {
 
     @Override
     public List<StockBancoSangreDTO> getObservationsFromExternalSystemById(Integer idBloodBank) {
-        String urlBaseExterno = "http://localhost:8081";
+        String urlBaseExterno = "http://3.236.29.17:8081";
         String token = login(urlBaseExterno);
 
         // Crear cliente FHIR con el token
@@ -98,7 +98,7 @@ public class FhirClientServiceImpl implements FhirClientService {
         RestTemplate restTemplate = new RestTemplate();
         String loginUrl = urlBaseExterno + "/client/auth/login";
 
-        AuthLoginRequest request = new AuthLoginRequest("pricing", "Prod_Yawar43");
+        AuthLoginRequest request = new AuthLoginRequest("MilitarTest", "Ija0nd92#S11");
         ResponseEntity<Map> response = restTemplate.postForEntity(loginUrl, request, Map.class);
 
         if (response.getBody() != null && response.getBody().get("token") != null) {

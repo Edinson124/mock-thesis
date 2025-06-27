@@ -9,8 +9,8 @@ import lombok.*;
 @Builder
 public class UnitMock {
     private String id;
-    private String tipo;           // Ej: "Concentrado de hematíes", "Plasma fresco"
-    private BloodTypeMock grupoSanguineo; // Ej: "A+", "O-"
+    private String tipo;
+    private BloodTypeMock grupoSanguineo;
     private String fechaVencimiento;
     private String estado;
 }
