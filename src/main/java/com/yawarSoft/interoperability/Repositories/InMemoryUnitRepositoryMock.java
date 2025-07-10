@@ -84,7 +84,7 @@ public class InMemoryUnitRepositoryMock {
                 .map(entry -> {
                     String[] parts = entry.getKey().split("\\|");
                     String sangre = parts[0];
-                    String rh = "+".equals(parts[1]) ? "POS" : "NEG";
+                    String rh = parts[1];
                     String tipo = parts[2];
                     long cantidad = entry.getValue().size();
                     return StockResumenDTO.builder()
